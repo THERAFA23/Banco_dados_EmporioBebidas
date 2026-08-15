@@ -78,6 +78,7 @@ Banco_dados_EmporioBebidas/
 └── docs/
     ├── Diagrama_lógico.png
     └── Dicionário de Dados.pdf
+```
 
 01_ddl.sql:
 
