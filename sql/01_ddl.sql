@@ -10,17 +10,17 @@ CREATE TABLE produto (
     id_produto SERIAL PRIMARY KEY,
     id_categoria INT NOT NULL,
     nome VARCHAR(150) NOT NULL,
-    preco DECIMAL(10, 2) NOT NULL,
-    quantidade_estoque INT NOT NULL DEFAULT 0,
+    preco DECIMAL(10, 2) NOT NULL CHECK (preco >= 0),
+    quantidade_estoque INT NOT NULL DEFAULT 0 CHECK (quantidade_estoque >= 0),
     FOREIGN KEY (id_categoria) REFERENCES categoria(id_categoria)
 );
 
 -- Especificação (Entidade Fraca de Produto - Relação 1:1)
 CREATE TABLE especificacao (
     id_produto INT PRIMARY KEY,
-    codigo_interno VARCHAR(50),
+    codigo_interno VARCHAR(50) NOT NULL UNIQUE,
     pais_origem VARCHAR(50),
-    teor_alcoolico DECIMAL(5, 2),
+    teor_alcoolico DECIMAL(5, 2) CHECK (teor_alcoolico >= 0),
     volume VARCHAR(20),
     FOREIGN KEY (id_produto) REFERENCES produto(id_produto) ON DELETE CASCADE
 );
@@ -56,10 +56,22 @@ CREATE TABLE venda (
     id_cliente INT NOT NULL,
     data_venda DATE NOT NULL,
     horario_venda TIME NOT NULL,
-    valor_total DECIMAL(10, 2) NOT NULL,
+    valor_total DECIMAL(10, 2) NOT NULL CHECK (valor_total >= 0),
     tipo VARCHAR(20) NOT NULL CHECK (tipo IN ('Entrega', 'Retirada')),
-    valor_frete DECIMAL(10, 2), -- Preenchido apenas se tipo = 'Entrega'
-    numero_retirada INT,        -- Preenchido apenas se tipo = 'Retirada'
+    valor_frete DECIMAL(10, 2), 
+    numero_retirada INT,  
+
+    CHECK (
+        (tipo = 'Entrega'
+            AND valor_frete IS NOT NULL
+            AND valor_frete >= 0
+            AND numero_retirada IS NULL)
+        OR
+        (tipo = 'Retirada'
+            AND valor_frete IS NULL
+            AND numero_retirada IS NOT NULL)
+    ),    
+
     FOREIGN KEY (id_cliente) REFERENCES cliente(id_cliente)
 );
 
@@ -68,8 +80,8 @@ CREATE TABLE item_pedido (
     id_venda INT NOT NULL,
     item_venda INT NOT NULL, -- Identificador parcial (ex: Item 1, Item 2 da mesma venda)
     id_produto INT NOT NULL,
-    quantidade INT NOT NULL,
-    preco_unitario DECIMAL(10, 2) NOT NULL,
+    quantidade INT NOT NULL CHECK (quantidade > 0),
+    preco_unitario DECIMAL(10, 2) NOT NULL CHECK (preco_unitario >= 0),
     PRIMARY KEY (id_venda, item_venda),
     FOREIGN KEY (id_venda) REFERENCES venda(id_venda) ON DELETE CASCADE,
     FOREIGN KEY (id_produto) REFERENCES produto(id_produto)
