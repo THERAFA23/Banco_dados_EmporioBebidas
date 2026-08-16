@@ -86,3 +86,9 @@ CREATE TABLE item_pedido (
     FOREIGN KEY (id_venda) REFERENCES venda(id_venda) ON DELETE CASCADE,
     FOREIGN KEY (id_produto) REFERENCES produto(id_produto)
 );
+
+-- Índices em FKs que não fazem parte de PRIMARY KEY nem UNIQUE
+CREATE INDEX idx_produto_id_categoria ON produto (id_categoria);
+CREATE INDEX idx_endereco_id_cliente ON endereco (id_cliente);
+CREATE INDEX idx_venda_id_cliente ON venda (id_cliente);
+CREATE INDEX idx_item_pedido_id_produto ON item_pedido (id_produto);
