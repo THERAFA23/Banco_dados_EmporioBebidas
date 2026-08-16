@@ -152,6 +152,8 @@ Os valores totais das vendas foram calculados a partir da soma dos valores dos r
 valor_total = Σ (quantidade × preco_unitario)
 ```
 
+Obs.: valor_frete não entra no valor_total.
+
 Também foram utilizadas as duas modalidades de venda:
 
 - **Entrega:** possui valor de frete;
@@ -196,7 +198,8 @@ Foram utilizadas restrições de integridade para garantir a consistência dos d
 - Valores obrigatórios (`NOT NULL`);
 - Valores únicos (`UNIQUE`);
 - Restrições de domínio (`CHECK`);
-- Exclusão em cascata (`ON DELETE CASCADE`) em relacionamentos específicos.
+- Exclusão em cascata (`ON DELETE CASCADE`) em relacionamentos específicos;
+- Índices (`CREATE INDEX`) nas chaves estrangeiras que não são cobertas por `PRIMARY KEY` ou `UNIQUE`.
 
 Entre as regras implementadas está a diferenciação entre vendas de **Entrega** e **Retirada**, garantindo que os atributos específicos de cada modalidade sejam preenchidos de acordo com o tipo da venda.
 
