@@ -14,3 +14,4 @@ services:
     volumes:
       - ./sql/01_ddl.sql:/docker-entrypoint-initdb.d/01_ddl.sql
       - ./sql/02_dml.sql:/docker-entrypoint-initdb.d/02_dml.sql
+      - ./sql/03_views.sql:/docker-entrypoint-initdb.d/03_views.sql
