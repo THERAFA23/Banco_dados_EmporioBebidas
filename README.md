@@ -171,7 +171,7 @@ Caso seja necessário recriar o banco completamente do zero, incluindo o volume 
 
 ```bash
 docker-compose down -v
-docker-compose up -d
+docker-compose up --build -d
 ```
 
 Os scripts presentes em `sql/` são executados automaticamente durante a inicialização de um banco novo.
@@ -359,3 +359,4 @@ Nesta versão foram corrigidos/complementados os seguintes pontos da entrega ant
   do backend e do frontend (`3000`).
 - **Controle de estoque:** adicionado o gatilho de baixa/reposição automática de estoque, incluindo
   validação de estoque insuficiente no momento da venda.
+- **Modelagem da modalidade de Entrega:** Conforme o feedback da avaliação passada, a tabela `venda` não possuía a chave estrangeira para identificar o destino da mercadoria. O erro foi corrigido adicionando a coluna `id_endereco` (como uma FK) na tabela `venda`. O DDL, o povoamento (DML), o Dicionário de Dados e os Diagramas (Lógico e Conceitual) foram integralmente atualizados. Além disso, o sistema (Frontend e Backend) foi programado para exigir a seleção de um endereço válido do cliente sempre que a modalidade da venda for "Entrega".
