@@ -146,7 +146,7 @@ Para executar o projeto, é necessário possuir o Docker e o Docker Compose inst
 Na pasta raiz do projeto, execute:
 
 ```bash
-docker-compose up -d
+docker-compose up --build -d
 ```
 
 Para verificar o estado do container:
@@ -257,8 +257,7 @@ O diagrama representa as entidades e seus relacionamentos:
 
 O dicionário de dados do projeto apresenta a descrição das tabelas, atributos, tipos de dados, chaves, restrições e demais informações referentes à estrutura do banco.
 
-O documento está disponível no diretório de documentação do projeto.
-
+**[Clique aqui para acessar o Dicionário de Dados (Google Docs)](https://docs.google.com/document/d/1cHAPpo-K_N8VmdyBa8RrGNFW67G5BEi8DoswQmxTwT8/edit?usp=sharing)**
 ## Integridade e Restrições
 
 Foram utilizadas restrições de integridade para garantir a consistência dos dados, incluindo:
