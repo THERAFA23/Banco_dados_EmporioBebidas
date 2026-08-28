@@ -1,0 +1,156 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1360 880" font-family="Segoe UI, Arial, sans-serif">
+  <rect x="0" y="0" width="1360" height="880" fill="#ffffff"/>
+  <text x="680" y="34" text-anchor="middle" font-size="20" font-weight="bold" fill="#0f172a">Empório de Bebidas — Modelo Conceitual (Entidade–Relacionamento)</text>
+  <text x="680" y="54" text-anchor="middle" font-size="12" fill="#64748b">Derivado do esquema implementado (sql/01_ddl.sql). Sublinhado = chave primária; borda dupla = entidade fraca.</text>
+
+  <!-- ================= CONECTORES ================= -->
+  <g stroke="#475569" stroke-width="1.6" fill="none">
+    <line x1="160" y1="146" x2="160" y2="300"/>            <!-- categoria-produto -->
+    <line x1="160" y1="422" x2="160" y2="560"/>            <!-- produto-especificacao -->
+    <line x1="260" y1="380" x2="470" y2="668"/>            <!-- produto-item_pedido -->
+    <line x1="600" y1="490" x2="600" y2="620"/>            <!-- venda-item_pedido -->
+    <line x1="850" y1="140" x2="722" y2="300"/>            <!-- cliente-venda -->
+    <line x1="955" y1="182" x2="955" y2="300"/>            <!-- cliente-endereco -->
+    <line x1="1060" y1="100" x2="1120" y2="100"/>          <!-- cliente-telefone -->
+    <line x1="850" y1="372" x2="760" y2="400"/>            <!-- endereco-venda -->
+  </g>
+
+  <!-- rótulos de relacionamento -->
+  <g font-size="12" font-style="italic" fill="#334155">
+    <text x="168" y="228">classifica</text>
+    <text x="168" y="498">detalha (1:1)</text>
+    <text x="300" y="520">compõe</text>
+    <text x="606" y="562">contém</text>
+    <text x="758" y="212">realiza</text>
+    <text x="963" y="248">possui</text>
+    <text x="1066" y="88">possui</text>
+    <text x="784" y="372">recebe (entrega)</text>
+  </g>
+
+  <!-- cardinalidades -->
+  <g font-size="13" font-weight="bold" fill="#b91c1c">
+    <text x="168" y="162">1</text>   <text x="168" y="294">N</text>
+    <text x="168" y="440">1</text>   <text x="168" y="554">1</text>
+    <text x="268" y="374">1</text>   <text x="452" y="662">N</text>
+    <text x="606" y="506">1</text>   <text x="606" y="614">N</text>
+    <text x="836" y="152">1</text>   <text x="712" y="312">N</text>
+    <text x="963" y="198">1</text>   <text x="963" y="294">N</text>
+    <text x="1050" y="92">1</text>   <text x="1104" y="114">N</text>
+    <text x="838" y="364">1</text>   <text x="742" y="410">N</text>
+  </g>
+
+  <!-- ================= ENTIDADES ================= -->
+  <!-- CATEGORIA -->
+  <g>
+    <rect x="60" y="60" width="200" height="86" fill="#ffffff" stroke="#334155" stroke-width="1.5"/>
+    <rect x="60" y="60" width="200" height="26" fill="#1e293b"/>
+    <text x="160" y="78" text-anchor="middle" font-size="13" font-weight="bold" fill="#ffffff">CATEGORIA</text>
+    <text x="74" y="106" font-size="12" fill="#0f172a" text-decoration="underline">id_categoria</text>
+    <text x="74" y="128" font-size="12" fill="#0f172a">nome</text>
+  </g>
+
+  <!-- PRODUTO -->
+  <g>
+    <rect x="60" y="300" width="200" height="122" fill="#ffffff" stroke="#334155" stroke-width="1.5"/>
+    <rect x="60" y="300" width="200" height="26" fill="#1e293b"/>
+    <text x="160" y="318" text-anchor="middle" font-size="13" font-weight="bold" fill="#ffffff">PRODUTO</text>
+    <text x="74" y="346" font-size="12" fill="#0f172a" text-decoration="underline">id_produto</text>
+    <text x="74" y="368" font-size="12" fill="#0f172a">nome</text>
+    <text x="74" y="390" font-size="12" fill="#0f172a">preco</text>
+    <text x="74" y="412" font-size="12" fill="#0f172a">quantidade_estoque</text>
+  </g>
+
+  <!-- ESPECIFICACAO (fraca) -->
+  <g>
+    <rect x="55" y="555" width="240" height="132" fill="none" stroke="#b45309" stroke-width="1.5"/>
+    <rect x="60" y="560" width="230" height="122" fill="#ffffff" stroke="#b45309" stroke-width="1.5"/>
+    <rect x="60" y="560" width="230" height="26" fill="#b45309"/>
+    <text x="175" y="578" text-anchor="middle" font-size="13" font-weight="bold" fill="#ffffff">ESPECIFICACAO</text>
+    <text x="74" y="606" font-size="12" fill="#0f172a" text-decoration="underline">codigo_interno</text>
+    <text x="200" y="606" font-size="10" fill="#b45309">(chave parcial)</text>
+    <text x="74" y="628" font-size="12" fill="#0f172a">pais_origem</text>
+    <text x="74" y="650" font-size="12" fill="#0f172a">teor_alcoolico</text>
+    <text x="74" y="672" font-size="12" fill="#0f172a">volume</text>
+  </g>
+
+  <!-- VENDA -->
+  <g>
+    <rect x="520" y="300" width="240" height="190" fill="#ffffff" stroke="#334155" stroke-width="1.5"/>
+    <rect x="520" y="300" width="240" height="26" fill="#1e293b"/>
+    <text x="640" y="318" text-anchor="middle" font-size="13" font-weight="bold" fill="#ffffff">VENDA</text>
+    <text x="534" y="346" font-size="12" fill="#0f172a" text-decoration="underline">id_venda</text>
+    <text x="534" y="368" font-size="12" fill="#0f172a">data_venda</text>
+    <text x="534" y="390" font-size="12" fill="#0f172a">horario_venda</text>
+    <text x="534" y="412" font-size="12" fill="#0f172a">valor_total</text>
+    <text x="534" y="434" font-size="12" fill="#0f172a">tipo (Entrega / Retirada)</text>
+    <text x="534" y="456" font-size="12" fill="#0f172a">valor_frete</text>
+    <text x="534" y="478" font-size="12" fill="#0f172a">numero_retirada</text>
+  </g>
+
+  <!-- ITEM_PEDIDO (fraca) -->
+  <g>
+    <rect x="465" y="615" width="260" height="114" fill="none" stroke="#b45309" stroke-width="1.5"/>
+    <rect x="470" y="620" width="250" height="104" fill="#ffffff" stroke="#b45309" stroke-width="1.5"/>
+    <rect x="470" y="620" width="250" height="26" fill="#b45309"/>
+    <text x="595" y="638" text-anchor="middle" font-size="13" font-weight="bold" fill="#ffffff">ITEM_PEDIDO</text>
+    <text x="484" y="666" font-size="12" fill="#0f172a" text-decoration="underline">item_venda</text>
+    <text x="600" y="666" font-size="10" fill="#b45309">(chave parcial)</text>
+    <text x="484" y="688" font-size="12" fill="#0f172a">quantidade</text>
+    <text x="484" y="710" font-size="12" fill="#0f172a">preco_unitario</text>
+  </g>
+
+  <!-- CLIENTE -->
+  <g>
+    <rect x="850" y="60" width="210" height="122" fill="#ffffff" stroke="#334155" stroke-width="1.5"/>
+    <rect x="850" y="60" width="210" height="26" fill="#1e293b"/>
+    <text x="955" y="78" text-anchor="middle" font-size="13" font-weight="bold" fill="#ffffff">CLIENTE</text>
+    <text x="864" y="106" font-size="12" fill="#0f172a" text-decoration="underline">id_cliente</text>
+    <text x="864" y="128" font-size="12" fill="#0f172a">cpf</text>
+    <text x="864" y="150" font-size="12" fill="#0f172a">nome</text>
+    <text x="864" y="172" font-size="12" fill="#0f172a">data_nascimento</text>
+  </g>
+
+  <!-- CLIENTE_TELEFONE (fraca) -->
+  <g>
+    <rect x="1115" y="55" width="230" height="76" fill="none" stroke="#b45309" stroke-width="1.5"/>
+    <rect x="1120" y="60" width="220" height="66" fill="#ffffff" stroke="#b45309" stroke-width="1.5"/>
+    <rect x="1120" y="60" width="220" height="26" fill="#b45309"/>
+    <text x="1230" y="78" text-anchor="middle" font-size="13" font-weight="bold" fill="#ffffff">CLIENTE_TELEFONE</text>
+    <text x="1134" y="106" font-size="12" fill="#0f172a" text-decoration="underline">numero_telefone</text>
+    <text x="1258" y="106" font-size="10" fill="#b45309">(parcial)</text>
+  </g>
+
+  <!-- ENDERECO -->
+  <g>
+    <rect x="850" y="300" width="210" height="146" fill="#ffffff" stroke="#334155" stroke-width="1.5"/>
+    <rect x="850" y="300" width="210" height="26" fill="#1e293b"/>
+    <text x="955" y="318" text-anchor="middle" font-size="13" font-weight="bold" fill="#ffffff">ENDERECO</text>
+    <text x="864" y="346" font-size="12" fill="#0f172a" text-decoration="underline">id_endereco</text>
+    <text x="864" y="368" font-size="12" fill="#0f172a">cep</text>
+    <text x="864" y="390" font-size="12" fill="#0f172a">bairro</text>
+    <text x="864" y="412" font-size="12" fill="#0f172a">rua</text>
+    <text x="864" y="434" font-size="12" fill="#0f172a">numero</text>
+  </g>
+
+  <!-- ================= LEGENDA ================= -->
+  <g>
+    <rect x="60" y="770" width="1240" height="86" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1"/>
+    <text x="74" y="792" font-size="13" font-weight="bold" fill="#0f172a">Legenda / Notação</text>
+
+    <rect x="74" y="806" width="26" height="18" fill="#ffffff" stroke="#334155" stroke-width="1.5"/>
+    <text x="108" y="820" font-size="12" fill="#334155">Entidade</text>
+
+    <rect x="196" y="803" width="30" height="24" fill="none" stroke="#b45309" stroke-width="1.5"/>
+    <rect x="200" y="807" width="22" height="16" fill="#ffffff" stroke="#b45309" stroke-width="1.5"/>
+    <text x="236" y="820" font-size="12" fill="#334155">Entidade fraca (borda dupla)</text>
+
+    <text x="470" y="820" font-size="12" fill="#334155" text-decoration="underline">atributo</text>
+    <text x="540" y="820" font-size="12" fill="#334155">= chave primária</text>
+
+    <text x="690" y="820" font-size="13" font-weight="bold" fill="#b91c1c">1 / N</text>
+    <text x="740" y="820" font-size="12" fill="#334155">= cardinalidade do relacionamento</text>
+
+    <text x="1010" y="820" font-size="12" fill="#334155">Fracas: ESPECIFICACAO, ITEM_PEDIDO,</text>
+    <text x="1010" y="840" font-size="12" fill="#334155">CLIENTE_TELEFONE</text>
+  </g>
+</svg>

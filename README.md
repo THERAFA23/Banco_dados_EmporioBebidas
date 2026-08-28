@@ -82,34 +82,45 @@ Banco_dados_EmporioBebidas/
 ├── LICENSE
 ├── README.md
 ├── Sistema
-│   ├── Dockerfile
-│   ├── jsconfig.json
-│   ├── node_modules
-│   ├── package-lock.json
-│   ├── package.json
-│   └── src
-│       ├── app
-│       │   ├── api
-│       │   │   ├── produtos
-│       │   │   │   └── route.js
-│       │   │   └── views
-│       │   │       └── route.js
-│       │   ├── layout.js
-│       │   ├── produtos
-│       │   │   └── page.js
-│       │   └── relatorios
-│       │       └── page.js
-│       └── lib
-│           └── db.js
+│   ├── Dockerfile
+│   ├── jsconfig.json
+│   ├── package-lock.json
+│   ├── package.json
+│   └── src
+│       ├── app
+│       │   ├── api
+│       │   │   ├── clientes
+│       │   │   │   └── route.js
+│       │   │   ├── enderecos
+│       │   │   │   └── route.js
+│       │   │   ├── produtos
+│       │   │   │   └── route.js
+│       │   │   ├── vendas
+│       │   │   │   └── route.js
+│       │   │   └── views
+│       │   │       └── route.js
+│       │   ├── layout.js
+│       │   ├── page.js
+│       │   ├── clientes
+│       │   │   └── page.js
+│       │   ├── produtos
+│       │   │   └── page.js
+│       │   ├── vendas
+│       │   │   └── page.js
+│       │   └── relatorios
+│       │       └── page.js
+│       └── lib
+│           └── db.js
 ├── docker-compose.yml
 ├── docs
-│   ├── Diagrama_lógico.png
-│   ├── Dicionário de Dados.pdf
-│   └── Dicionário de Dados.pdfZone.Identifier
+│   ├── Diagrama_lógico.png
+│   ├── Modelo_Conceitual.svg
+│   └── Dicionário de Dados.pdf
 └── sql
     ├── 01_ddl.sql
     ├── 02_dml.sql
-    └── 03_views.sql
+    ├── 03_views.sql
+    └── 04_triggers.sql
 ```
 
 ### `01_ddl.sql`
@@ -123,6 +134,10 @@ Responsável pelo povoamento do banco de dados com os dados utilizados nos teste
 ### `03_views.sql`
 
 Responsável por gerar as views do banco de dados.
+
+### `04_triggers.sql`
+
+Responsável por criar o **gatilho (trigger) de controle automático de estoque** e a função `plpgsql` associada. Consulte a seção [Gatilho (Trigger) de Controle de Estoque](#gatilho-trigger-de-controle-de-estoque) para detalhes da regra de negócio e de como testá-lo.
 
 ## Execução com Docker
 
@@ -219,6 +234,25 @@ A tabela `cliente_telefone` também utiliza uma chave composta:
 
 representando o atributo multivalorado de telefone associado ao cliente.
 
+## Esquema Conceitual
+
+O esquema conceitual do banco (modelo Entidade–Relacionamento) está disponível em
+[`docs/Modelo_Conceitual.svg`](docs/Modelo_Conceitual.svg).
+
+![Modelo Conceitual](docs/Modelo_Conceitual.svg)
+
+O diagrama representa as entidades e seus relacionamentos:
+
+- **Entidades fortes:** `CATEGORIA`, `PRODUTO`, `CLIENTE`, `ENDERECO`, `VENDA`.
+- **Entidades fracas:** `ESPECIFICACAO` (dependente de `PRODUTO`, relação 1:1), `CLIENTE_TELEFONE`
+  (atributo multivalorado de `CLIENTE`) e `ITEM_PEDIDO` (dependente de `VENDA`).
+- **Relacionamentos e cardinalidades:** uma `CATEGORIA` classifica vários `PRODUTO`s (1:N);
+  um `CLIENTE` possui vários `ENDERECO`s e vários telefones (1:N) e realiza várias `VENDA`s (1:N);
+  uma `VENDA` contém vários `ITEM_PEDIDO`s (1:N) e cada item compõe-se de um `PRODUTO` (N:1);
+  uma `VENDA` do tipo *Entrega* está associada a um `ENDERECO`.
+
+> O modelo lógico correspondente encontra-se em [`docs/Diagrama_lógico.png`](docs/Diagrama_lógico.png).
+
 ## Dicionário de Dados
 
 O dicionário de dados do projeto apresenta a descrição das tabelas, atributos, tipos de dados, chaves, restrições e demais informações referentes à estrutura do banco.
@@ -246,3 +280,83 @@ Foram realizadas consultas para verificar a quantidade de registros e a consist�
 Também foi validado que o `valor_total` de cada venda corresponde à soma dos valores dos seus itens de pedido.
 
 Além disso, o povoamento foi verificado para garantir a existência de quatro itens em cada uma das 50 vendas, totalizando 200 registros em `item_pedido`.
+
+## Gatilho (Trigger) de Controle de Estoque
+
+O banco possui um gatilho que **automatiza a atualização do estoque dos produtos**, definido em
+[`sql/04_triggers.sql`](sql/04_triggers.sql).
+
+### Regra de negócio automatizada
+
+Sempre que um produto é vendido, seu estoque deve diminuir automaticamente; e sempre que uma venda é
+cancelada ou editada, o estoque deve ser reposto. O gatilho garante essa regra diretamente no banco,
+independentemente da aplicação:
+
+| Operação em `item_pedido` | Ação automática no estoque do produto |
+|---|---|
+| `INSERT` (novo item vendido) | **Debita** `quantidade_estoque` na quantidade vendida |
+| `DELETE` (item removido — exclusão/edição de venda) | **Repõe** `quantidade_estoque` |
+| `UPDATE` (alteração de item) | Repõe a quantidade antiga e debita a nova |
+
+Além disso, o gatilho **impede a venda sem estoque suficiente**: se a quantidade solicitada for maior
+que o estoque disponível, ele lança um erro (`RAISE EXCEPTION`) com uma mensagem clara e a operação é
+desfeita (`ROLLBACK`). A API de vendas repassa essa mensagem para a tela.
+
+- **Objeto:** `TRIGGER trg_controla_estoque AFTER INSERT OR UPDATE OR DELETE ON item_pedido`
+- **Função:** `fn_controla_estoque()` (linguagem PL/pgSQL)
+
+> **Observação de projeto:** o gatilho é criado **após** o povoamento (`02_dml.sql`). Portanto, as
+> vendas do povoamento inicial não passaram por ele. O gatilho controla integralmente as vendas
+> **criadas, editadas e excluídas através do sistema**.
+
+### Como testar
+
+**Pela interface (recomendado):**
+
+1. Acesse **Produtos** (`http://localhost:3000/produtos`) e anote o estoque de um produto.
+2. Acesse **Vendas** (`http://localhost:3000/vendas`), crie uma venda incluindo esse produto e finalize.
+3. Volte em **Produtos** e confira: o estoque foi **reduzido** automaticamente pela quantidade vendida.
+4. Em **Vendas**, exclua (ou edite) a venda e confirme que o estoque foi **reposto**.
+5. Para ver a validação, tente vender uma quantidade maior que o estoque: a aplicação exibe
+   *"Estoque insuficiente para o produto ..."* e a venda não é registrada.
+
+**Pelo SQL (via `psql`):**
+
+```sql
+-- estoque antes
+SELECT id_produto, nome, quantidade_estoque FROM produto WHERE id_produto = 3;
+
+-- simula um item vendido na venda 1 (o gatilho debita o estoque)
+INSERT INTO item_pedido (id_venda, item_venda, id_produto, quantidade, preco_unitario)
+VALUES (1, 5, 3, 4, 45.5);
+
+-- estoque depois (reduziu 4 unidades)
+SELECT id_produto, nome, quantidade_estoque FROM produto WHERE id_produto = 3;
+
+-- remove o item (o gatilho repõe o estoque)
+DELETE FROM item_pedido WHERE id_venda = 1 AND item_venda = 5;
+```
+
+## Gerador de Relatórios
+
+A tela de **Relatórios** (`http://localhost:3000/relatorios`) consome as views definidas em
+`03_views.sql` e oferece:
+
+- Visualização consolidada das três views (Resumo de Vendas, Produtos Mais Vendidos, Resumo de Clientes);
+- Um **gerador de relatórios customizados**, com escolha de colunas, reordenação, busca e filtros
+  (por período, tipo de venda, categoria e faixa de valor);
+- **Exportação para CSV e PDF** do relatório configurado.
+
+## Correções em Relação à Entrega Anterior
+
+Nesta versão foram corrigidos/complementados os seguintes pontos da entrega anterior:
+
+- **CRUD de Vendas completo:** as vendas passaram a ter também **atualização (UPDATE)** e
+  **exclusão (DELETE)**, além de criação e leitura, tanto no backend (`api/vendas/route.js`) quanto
+  na interface (`vendas/page.js`).
+- **Esquema conceitual:** adicionado o modelo conceitual atualizado em `docs/Modelo_Conceitual.svg`,
+  que estava pendente na entrega anterior.
+- **Documentação de portas:** o README passou a documentar explicitamente as portas do banco (`5433`),
+  do backend e do frontend (`3000`).
+- **Controle de estoque:** adicionado o gatilho de baixa/reposição automática de estoque, incluindo
+  validação de estoque insuficiente no momento da venda.

@@ -105,9 +105,12 @@ export default function TelaVendas() {
     if (res.ok) {
       limparFormulario();
       carregarVendas();
+      carregarProdutos();
       alert(editandoId ? "Venda atualizada!" : "Venda registrada!");
     } else {
-      alert(editandoId ? "Erro ao atualizar venda." : "Erro ao registrar venda.");
+      // Repassa a mensagem do servidor (ex.: estoque insuficiente vindo do gatilho)
+      const dados = await res.json().catch(() => ({}));
+      alert(dados.erro || (editandoId ? "Erro ao atualizar venda." : "Erro ao registrar venda."));
     }
   };
 
@@ -143,6 +146,7 @@ export default function TelaVendas() {
     if (res.ok) {
       if (editandoId === id_venda) limparFormulario();
       carregarVendas();
+      carregarProdutos();
     } else {
       alert("Erro ao deletar a venda.");
     }

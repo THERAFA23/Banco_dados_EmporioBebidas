@@ -85,6 +85,11 @@ export async function POST(request) {
     return NextResponse.json({ message: 'Venda registrada com sucesso!' }, { status: 201 });
   } catch (error) {
     await client.query('ROLLBACK');
+    // Erros lançados pelo gatilho de estoque (RAISE EXCEPTION) chegam com code P0001.
+    // Nesse caso, repassamos a mensagem específica (ex.: estoque insuficiente) para a tela.
+    if (error.code === 'P0001') {
+      return NextResponse.json({ erro: error.message }, { status: 400 });
+    }
     return NextResponse.json({ erro: 'Falha ao registrar venda. Verifique os dados.' }, { status: 500 });
   } finally {
     client.release();
@@ -130,6 +135,10 @@ export async function PUT(request) {
     return NextResponse.json({ message: 'Venda atualizada com sucesso!' }, { status: 200 });
   } catch (error) {
     await client.query('ROLLBACK');
+    // Mesma lógica do POST: repassa a mensagem do gatilho de estoque, se houver.
+    if (error.code === 'P0001') {
+      return NextResponse.json({ erro: error.message }, { status: 400 });
+    }
     return NextResponse.json({ erro: 'Falha ao atualizar venda. Verifique os dados.' }, { status: 500 });
   } finally {
     client.release();
